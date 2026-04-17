@@ -2423,9 +2423,6 @@
             </div>
             <ul id="buttons01" class="buttons">
               <li>
-                <a href="#" class="button n04" role="button">home</a>
-              </li>
-              <li>
                 <a href="#one" class="button n01" role="button"
                   >likes + dislikes</a
                 >
@@ -2526,13 +2523,11 @@
       });
     });
 
-    document.querySelectorAll('a[href="#"]').forEach(function (btn) {
-      btn.addEventListener('click', function (e) {
-        e.preventDefault();
-        history.pushState(null, '', '#');
-        showSection(null);
-        window.scrollTo(0, 0);
-      });
+    document.querySelector('#icons01 a.n01').addEventListener('click', function (e) {
+      e.preventDefault();
+      history.pushState(null, '', '#');
+      showSection(null);
+      window.scrollTo(0, 0);
     });
 
     var initialHash = location.hash ? location.hash.substring(1) : null;
