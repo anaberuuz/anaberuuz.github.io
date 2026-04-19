@@ -17,86 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?display=swap&amp;family=Poppins:ital,wght@0,400;0,700;1,400;1,700&amp;family=Zen+Dots:ital,wght@0,400;1,400" rel="stylesheet" type="text/css"/>
     <link rel="icon" href="https://avatars.githubusercontent.com/u/214314924?v=4" type="image/x-icon">
     <style>
-      html,
-      body,
-      div,
-      span,
-      applet,
-      object,
-      iframe,
-      h1,
-      h2,
-      h3,
-      h4,
-      h5,
-      h6,
-      p,
-      blockquote,
-      pre,
-      a,
-      abbr,
-      acronym,
-      address,
-      big,
-      cite,
-      code,
-      del,
-      dfn,
-      em,
-      img,
-      ins,
-      kbd,
-      q,
-      s,
-      samp,
-      small,
-      strike,
-      strong,
-      sub,
-      sup,
-      tt,
-      var,
-      b,
-      u,
-      i,
-      center,
-      dl,
-      dt,
-      dd,
-      ol,
-      ul,
-      li,
-      fieldset,
-      form,
-      label,
-      legend,
-      table,
-      caption,
-      tbody,
-      tfoot,
-      thead,
-      tr,
-      th,
-      td,
-      article,
-      aside,
-      canvas,
-      details,
-      embed,
-      figure,
-      figcaption,
-      footer,
-      header,
-      hgroup,
-      menu,
-      nav,
-      output,
-      ruby,
-      section,
-      summary,
-      time,
-      mark,
-      audio,
+      html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,
       video {
         margin: 0;
         padding: 0;
@@ -105,16 +26,7 @@
         font: inherit;
         vertical-align: baseline;
       }
-      article,
-      aside,
-      details,
-      figcaption,
-      figure,
-      footer,
-      header,
-      hgroup,
-      menu,
-      nav,
+      article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,
       section {
         display: block;
       }
@@ -2355,7 +2267,27 @@
         }
       </style></noscript
     >
-    <style></style>
+    <style>
+@keyframes revealBox {
+  from { clip-path: inset(0 0 100% 0); }
+  to   { clip-path: inset(0 0 0% 0); }
+}
+
+@keyframes fadeInText {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+section.animating {
+  animation: revealBox 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+section.animating .inner {
+  animation: fadeInText 0.4s ease forwards;
+  animation-delay: 0.35s;
+  opacity: 0;
+}
+    </style>
   </head>
   <body class="is-ready">
     <svg
@@ -2502,16 +2434,29 @@
   (function () {
     var sections = document.querySelectorAll('#main > .inner > section');
 
-    function showSection(hash) {
-      sections.forEach(function (sec) {
-        var isTarget = hash
-          ? sec.id === hash + '-section'
-          : sec.id === 'fill-section';
-        sec.classList.toggle('active', isTarget);
-        sec.classList.toggle('inactive', !isTarget);
-        sec.style.display = isTarget ? '' : 'none';
-      });
-    }
+  function showSection(hash) {
+    sections.forEach(function (sec) {
+      var isTarget = hash
+        ? sec.id === hash + '-section'
+        : sec.id === 'fill-section';
+  
+      if (isTarget) {
+        sec.classList.remove('inactive');
+        sec.style.display = '';
+        // Trigger reflow so the animation restarts cleanly
+        void sec.offsetWidth;
+        sec.classList.add('active', 'animating');
+        sec.addEventListener('animationend', function handler() {
+          sec.classList.remove('animating');
+          sec.removeEventListener('animationend', handler);
+        });
+      } else {
+        sec.classList.toggle('active', false);
+        sec.classList.toggle('inactive', true);
+        sec.style.display = 'none';
+      }
+    });
+  }
 
     document.querySelectorAll('#buttons01 .button').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
