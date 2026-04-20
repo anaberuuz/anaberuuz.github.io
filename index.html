@@ -2433,33 +2433,40 @@ section.fading-out {
     var sections = document.querySelectorAll('#main > .inner > section');
 
     function showSection(hash) {
+      var target = null;
       sections.forEach(function (sec) {
         var isTarget = hash
           ? sec.id === hash + '-section'
           : sec.id === 'fill-section';
-    
-        if (isTarget) {
-          sec.classList.remove('inactive', 'fading-out');
-          sec.style.display = '';
-          void sec.offsetWidth;
-          sec.classList.add('active', 'fading-in');
-          sec.addEventListener('animationend', function handler() {
-            sec.classList.remove('fading-in');
-            sec.removeEventListener('animationend', handler);
-          });
-        } else if (sec.classList.contains('active')) {
-          sec.classList.add('fading-out');
-          sec.addEventListener('animationend', function handler() {
-            sec.classList.remove('active', 'fading-out');
-            sec.classList.add('inactive');
-            sec.style.display = 'none';
-            sec.removeEventListener('animationend', handler);
-          });
-        } else {
-          sec.style.display = 'none';
-          sec.classList.add('inactive');
-        }
+        if (isTarget) target = sec;
       });
+    
+      var current = document.querySelector('#main > .inner > section.active');
+    
+      function revealTarget() {
+        if (!target) return;
+        target.classList.remove('inactive', 'fading-out');
+        target.style.display = '';
+        void target.offsetWidth;
+        target.classList.add('active', 'fading-in');
+        target.addEventListener('animationend', function handler() {
+          target.classList.remove('fading-in');
+          target.removeEventListener('animationend', handler);
+        });
+      }
+    
+      if (current && current !== target) {
+        current.classList.add('fading-out');
+        current.addEventListener('animationend', function handler() {
+          current.classList.remove('active', 'fading-out');
+          current.classList.add('inactive');
+          current.style.display = 'none';
+          current.removeEventListener('animationend', handler);
+          revealTarget();
+        });
+      } else {
+        revealTarget();
+      }
     }
 
     document.querySelectorAll('#buttons01 .button').forEach(function (btn) {
