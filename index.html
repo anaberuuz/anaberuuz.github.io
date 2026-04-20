@@ -2268,24 +2268,22 @@
       </style></noscript
     >
     <style>
-@keyframes revealBox {
-  from { clip-path: inset(0 0 100% 0); }
-  to   { clip-path: inset(0 0 0% 0); }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes fadeInText {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-12px); }
 }
 
-section.animating {
-  animation: revealBox 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+section.fading-in {
+  animation: fadeIn 0.35s ease forwards;
 }
 
-section.animating .inner {
-  animation: fadeInText 0.4s ease forwards;
-  animation-delay: 0.35s;
-  opacity: 0;
+section.fading-out {
+  animation: fadeOut 0.25s ease forwards;
 }
     </style>
   </head>
@@ -2434,29 +2432,35 @@ section.animating .inner {
   (function () {
     var sections = document.querySelectorAll('#main > .inner > section');
 
-  function showSection(hash) {
-    sections.forEach(function (sec) {
-      var isTarget = hash
-        ? sec.id === hash + '-section'
-        : sec.id === 'fill-section';
-  
-      if (isTarget) {
-        sec.classList.remove('inactive');
-        sec.style.display = '';
-        // Trigger reflow so the animation restarts cleanly
-        void sec.offsetWidth;
-        sec.classList.add('active', 'animating');
-        sec.addEventListener('animationend', function handler() {
-          sec.classList.remove('animating');
-          sec.removeEventListener('animationend', handler);
-        });
-      } else {
-        sec.classList.toggle('active', false);
-        sec.classList.toggle('inactive', true);
-        sec.style.display = 'none';
-      }
-    });
-  }
+    function showSection(hash) {
+      sections.forEach(function (sec) {
+        var isTarget = hash
+          ? sec.id === hash + '-section'
+          : sec.id === 'fill-section';
+    
+        if (isTarget) {
+          sec.classList.remove('inactive', 'fading-out');
+          sec.style.display = '';
+          void sec.offsetWidth;
+          sec.classList.add('active', 'fading-in');
+          sec.addEventListener('animationend', function handler() {
+            sec.classList.remove('fading-in');
+            sec.removeEventListener('animationend', handler);
+          });
+        } else if (sec.classList.contains('active')) {
+          sec.classList.add('fading-out');
+          sec.addEventListener('animationend', function handler() {
+            sec.classList.remove('active', 'fading-out');
+            sec.classList.add('inactive');
+            sec.style.display = 'none';
+            sec.removeEventListener('animationend', handler);
+          });
+        } else {
+          sec.style.display = 'none';
+          sec.classList.add('inactive');
+        }
+      });
+    }
 
     document.querySelectorAll('#buttons01 .button').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
